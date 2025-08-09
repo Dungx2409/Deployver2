@@ -43,6 +43,7 @@ const myChart = new Chart(ctx, {
 // const socket = new WebSocket('ws://localhost:3000');
 const socket = new WebSocket(`wss://${window.location.host}`);
 
+
 let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
 
 socket.onmessage = (event) => {
@@ -98,7 +99,7 @@ async function loadHistory() {
 
     try {
 
-        const response = await fetch(`https://traica.onrender.com/data_sensor?from=${from}&to=${to}`);
+        const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${from}&to=${to}`);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -162,7 +163,7 @@ async function controlServo(value) {
         statusElement.textContent = 'Đang gửi lệnh...';
         statusElement.style.color = 'orange';
 
-        const response = await fetch('https://traica.onrender.com/control/servo', {
+        const response = await fetch('https://traica-deploy.onrender.com/control/servo', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -192,7 +193,7 @@ async function controlServo(value) {
 // Hàm cập nhật lượng thức ăn dựa vào distance (sửa element ID)
 function updateFoodLevel(distanceInCm) {
     const foodPercentageElement = document.getElementById('food-percentage');
-    const foodStatusElement = document.getElementById('food-status');
+    const foodStatusElement = document.getElementById('food-s   tatus');
     
     if (!foodPercentageElement || !foodStatusElement) return;
     
