@@ -1,3 +1,20 @@
+// Kiểm tra trạng thái kết nối mạng và cập nhật trạng thái hệ thống
+function updateSystemStatus() {
+    var statusText = document.getElementById('status-text');
+    if (statusText) {
+        if (navigator.onLine) {
+            statusText.textContent = 'Đang hoạt động';
+            statusText.style.color = '#28a745'; // xanh lá
+        } else {
+            statusText.textContent = 'Ngoại tuyến';
+            statusText.style.color = '#dc3545'; // đỏ
+        }
+    }
+}
+
+window.addEventListener('online', updateSystemStatus);
+window.addEventListener('offline', updateSystemStatus);
+window.addEventListener('DOMContentLoaded', updateSystemStatus);
 const labels = []; // thời gian
 const tempData = []; // nhiệt độ
 const turbData = []; // độ đục
