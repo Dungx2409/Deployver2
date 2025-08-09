@@ -41,7 +41,7 @@ const myChart = new Chart(ctx, {
 
 // 📡 Nhận dữ liệu thời gian thực qua WebSocket
 // const socket = new WebSocket('ws://localhost:3000');
-const socket = new WebSocket('wss://myproject.onrender.com');
+const socket = new WebSocket(`wss://${window.location.host}`);
 
 let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
 
