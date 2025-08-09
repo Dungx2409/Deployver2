@@ -48,40 +48,38 @@ let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
 
 socket.onmessage = (event) => {
     const json = JSON.parse(event.data);
-    // Nếu có trạng thái hệ thống từ server
-    if (json.system_status) {
-        var statusText = document.getElementById('status-text');
-        if (json.system_status === 'online') {
-            statusText.textContent = 'Đang hoạt động';
-            statusText.style.color = '#28a745';
-        } else {
-            statusText.textContent = 'Ngoại tuyến';
-            statusText.style.color = '#dc3545';
-        }
-        return;
-    }
+    console.log('Realtime data:', json);
 
     // Xử lý dữ liệu unified format
     if (json.temperature !== undefined && json.turbidity !== undefined) {
+        // Dữ liệu sensor (nhiệt độ, độ đục) - chỉ cập nhật biểu đồ khi ở chế độ realtime
         if (isRealtimeMode) {
+            // Chỉ hiển thị ngày, bỏ giờ
             const dateOnly = json.timestamp.split(' ')[0] || json.timestamp.split('T')[0];
             labels.push(dateOnly);
             tempData.push(json.temperature);
             turbData.push(json.turbidity);
+
+            // Chỉ giữ lại 10 điểm gần nhất
             if (labels.length > 10) {
                 labels.shift();
                 tempData.shift();
                 turbData.shift();
             }
+
             myChart.update();
         }
     }
+
+    // Cập nhật trạng thái thiết bị (luôn cập nhật, không phụ thuộc vào realtime mode)
     if (json.distance !== undefined) {
         updateFoodLevel(json.distance);
     }
+    
     if (json.PIR !== undefined) {
         updateMotionDetection(json.PIR);
     }
+
     if (json.turbidity !== undefined) {
         updateWaterQuality(json.turbidity);
     }

@@ -13,7 +13,7 @@ const server = http.createServer(app);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors());
-app.use(express.json()); // Parse JSON body
+app.use(express.json()); // Parse 50JSON body
 
 // Setup WebSocket & MQTT
 const wsClients = setupWebSocket(server);
