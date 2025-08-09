@@ -14,7 +14,7 @@ setupMQTT(wsClients);
 
 
 app.use(cors());
-app.use(express.static('public'));
+app.use(express.static('./public'));
 app.use(express.json()); // Thêm middleware để parse JSON
 
 // API endpoint để điều khiển servo
