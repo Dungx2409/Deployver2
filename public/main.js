@@ -193,7 +193,7 @@ async function controlServo(value) {
 // Hàm cập nhật lượng thức ăn dựa vào distance (sửa element ID)
 function updateFoodLevel(distanceInCm) {
     const foodPercentageElement = document.getElementById('food-percentage');
-    const foodStatusElement = document.getElementById('food-s   tatus');
+    const foodStatusElement = document.getElementById('food-status');
     
     if (!foodPercentageElement || !foodStatusElement) return;
     
