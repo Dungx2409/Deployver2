@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const http = require('http');
 const path = require('path');
-
 const { setupWebSocket } = require('./websocket');
 const { setupMQTT, publishServoControl } = require('./mqttHandler');
 const { db, ref, get, query, orderByChild, startAt, endAt } = require('./firebase');

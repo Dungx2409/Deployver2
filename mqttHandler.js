@@ -7,6 +7,16 @@ function setupMQTT(wsList) {
   wsClients = wsList;
   mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
 
+  let isDeviceOnline = false;
+  let offlineTimeout = null;
+  const OFFLINE_INTERVAL = 30000; // 30 giây
+
+  function notifyStatus(status) {
+    wsClients.forEach(ws => {
+      if (ws.readyState === 1) ws.send(JSON.stringify({ system_status: status }));
+    });
+  }
+
   mqttClient.on('connect', () => {
     mqttClient.subscribe('/sensor/data');
     console.log('MQTT connected and subscribed to /sensor/data');
@@ -15,12 +25,23 @@ function setupMQTT(wsList) {
   mqttClient.on('message', (topic, message) => {
     const data = JSON.parse(message.toString());
     console.log("MQTT Received:", data);
-    
     // Lưu vào Firebase
     push(ref(db, 'data_sensor'), data);
 
+    // Nếu lần đầu nhận dữ liệu, gửi trạng thái online
+    if (!isDeviceOnline) {
+      isDeviceOnline = true;
+      notifyStatus('online');
+    }
 
-    // Gửi qua WebSocket
+    // Reset bộ đếm offline mỗi lần nhận dữ liệu
+    if (offlineTimeout) clearTimeout(offlineTimeout);
+    offlineTimeout = setTimeout(() => {
+      isDeviceOnline = false;
+      notifyStatus('offline');
+    }, OFFLINE_INTERVAL);
+
+    // Gửi dữ liệu sensor như cũ
     wsClients.forEach(ws => {
       if (ws.readyState === 1) ws.send(JSON.stringify(data));
     });
