@@ -39,19 +39,20 @@ const myChart = new Chart(ctx, {
     }
 });
 
-// Nhận dữ liệu thời gian thực qua WebSocket
+// 📡 Nhận dữ liệu thời gian thực qua WebSocket
+// const socket = new WebSocket('ws://localhost:3000');
 const socket = new WebSocket(`wss://${window.location.host}`);
 
 
-let isRealtimeMode = true;
-let isStatusActive = true;
+let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
+let isStatusActive = false;
 let offlineTimeout = null;
-const OFFLINE_INTERVAL = 30000;
+const OFFLINE_INTERVAL = 10000;
 
 socket.onmessage = (event) => {
     const json = JSON.parse(event.data);
     console.log('Realtime data:', json);
-
+    const dateOnly = json.timestamp.split(' ')[0] || json.timestamp.split('T')[0];
     if (json.temperature !== undefined && json.turbidity !== undefined) {
         if (isRealtimeMode) {
             labels.push(dateOnly);
@@ -74,7 +75,6 @@ socket.onmessage = (event) => {
                 isStatusActive = false;
                 document.getElementById('system').textContent = 'Ngoại tuyến';
             }, OFFLINE_INTERVAL);
-
             myChart.update();
         }
     }
@@ -90,12 +90,13 @@ socket.onmessage = (event) => {
     if (json.turbidity !== undefined) {
         updateWaterQuality(json.turbidity);
     }
+
     if(json.temperature !== undefined) {
         updateTemperature(json.temperature);
     }
 };
 
-// Tải dữ liệu cũ từ Firebase thông qua server
+// 📥 Tải dữ liệu cũ từ Firebase thông qua server
 async function loadHistory() {
     const from = document.getElementById('from-date').value;
     const to = document.getElementById('to-date').value;
@@ -139,7 +140,6 @@ async function loadHistory() {
         isRealtimeMode = true;
     }
 }
-
 
 function enableRealtime() {
     isRealtimeMode = true;
@@ -201,7 +201,7 @@ async function controlServo(value) {
     }
 }
 
-// Hàm cập nhật lượng thức ăn dựa vào distance
+// Hàm cập nhật lượng thức ăn dựa vào distance (sửa element ID)
 function updateFoodLevel(distanceInCm) {
     const foodPercentageElement = document.getElementById('food-percentage');
     const foodStatusElement = document.getElementById('food-status');
@@ -214,7 +214,7 @@ function updateFoodLevel(distanceInCm) {
         return;
     }
 
-    // Tính toán mức thức ăn
+    // Tính toán mức thức ăn (distance càng lớn = thức ăn càng ít)
     let foodLevel;
     let levelText;
     let statusText;
@@ -243,19 +243,6 @@ function updateFoodLevel(distanceInCm) {
 
     foodPercentageElement.textContent = levelText;
     foodStatusElement.textContent = statusText;
-}
-
-function updateTemperature(temperature) {
-    const temperatureElement = document.getElementById('current-temperature');
-    if (!temperatureElement) return;
-
-    if (temperature === undefined || temperature === null) {
-        temperatureElement.textContent = '--';
-        return;
-    }
-
-    // Cập nhật giá trị nhiệt độ
-    temperatureElement.textContent = `${temperature} °C`;
 }
 
 // Hàm cập nhật chất lượng nước
@@ -288,9 +275,23 @@ function updateWaterQuality(turbidity) {
         qualityText = 'Kém';
         statusText = 'Cần xử lý';
     }
+    
 
     waterQualityElement.textContent = qualityText;
     waterStatusElement.textContent = statusText;
+}
+
+function updateTemperature(temperature) {
+    const temperatureElement = document.getElementById('current-temperature');
+    if (!temperatureElement) return;
+
+    if (temperature === undefined || temperature === null) {
+        temperatureElement.textContent = '--';
+        return;
+    }
+
+    // Cập nhật giá trị nhiệt độ
+    temperatureElement.textContent = `${temperature} °C`;
 }
 
 // Hàm cập nhật phát hiện chuyển động
@@ -304,6 +305,7 @@ function updateMotionDetection(pirValue) {
         return;
     }
 
+    // PIR sensor: 1 = có chuyển động, 0 = không có chuyển động
     if (pirValue === 1 || pirValue === '1' || pirValue === true) {
         motionElement.textContent = 'Phát hiện chuyển động';
         motionElement.style.color = '#ff5722';
@@ -392,7 +394,7 @@ function enableAlert() {
 }
 
 
-// Tự động set ngày hôm nay và hôm qua
+// 🕒 Tự động set ngày hôm nay và hôm qua
 window.onload = () => {
     const today = new Date();
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
@@ -412,7 +414,7 @@ window.onload = () => {
     loadDeviceStatus();
 };
 
-// Hàm tải trạng thái thiết bị ban đầu
+// 📡 Hàm tải trạng thái thiết bị ban đầu
 async function loadDeviceStatus() {
     try {
         const today = new Date();
@@ -439,6 +441,10 @@ async function loadDeviceStatus() {
 
                 if (latestStatus.turbidity !== undefined) {
                     updateWaterQuality(latestStatus.turbidity);
+                }
+
+                if (latestStatus.temperature !== undefined) {
+                    updateTemperature(latestStatus.temperature);
                 }
             }
         }
