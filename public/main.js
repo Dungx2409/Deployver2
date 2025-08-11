@@ -45,33 +45,41 @@ const socket = new WebSocket(`wss://${window.location.host}`);
 
 
 let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
+let isStatusActive = true;
+let offlineTimeout = null;
+const OFFLINE_INTERVAL = 30000;
 
 socket.onmessage = (event) => {
     const json = JSON.parse(event.data);
     console.log('Realtime data:', json);
 
-    // Xử lý dữ liệu unified format
     if (json.temperature !== undefined && json.turbidity !== undefined) {
-        // Dữ liệu sensor (nhiệt độ, độ đục) - chỉ cập nhật biểu đồ khi ở chế độ realtime
         if (isRealtimeMode) {
-            // Chỉ hiển thị ngày, bỏ giờ
-            const dateOnly = json.timestamp.split(' ')[0] || json.timestamp.split('T')[0];
             labels.push(dateOnly);
             tempData.push(json.temperature);
             turbData.push(json.turbidity);
 
-            // Chỉ giữ lại 10 điểm gần nhất
+            // Giữ tối đa 10 điểm
             if (labels.length > 10) {
                 labels.shift();
                 tempData.shift();
                 turbData.shift();
             }
+            
+            isStatusActive = true;
+            document.getElementById('system').textContent = 'Đang hoạt động';
+
+            // Reset bộ đếm offline
+            if (offlineTimeout) clearTimeout(offlineTimeout);
+            offlineTimeout = setTimeout(() => {
+                isStatusActive = false;
+                document.getElementById('system').textContent = 'Ngoại tuyến';
+            }, OFFLINE_INTERVAL);
 
             myChart.update();
         }
     }
 
-    // Cập nhật trạng thái thiết bị (luôn cập nhật, không phụ thuộc vào realtime mode)
     if (json.distance !== undefined) {
         updateFoodLevel(json.distance);
     }
