@@ -47,7 +47,7 @@ const socket = new WebSocket(`wss://${window.location.host}`);
 let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
 let isStatusActive = false;
 let offlineTimeout = null;
-const OFFLINE_INTERVAL = 3000;
+const OFFLINE_INTERVAL = 10000;
 
 socket.onmessage = (event) => {
     const json = JSON.parse(event.data);
