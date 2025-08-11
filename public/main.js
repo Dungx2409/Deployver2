@@ -45,7 +45,7 @@ const socket = new WebSocket(`wss://${window.location.host}`);
 
 
 let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
-let isStatusActive = true;
+let isStatusActive = false;
 let offlineTimeout = null;
 const OFFLINE_INTERVAL = 30000;
 
@@ -75,7 +75,6 @@ socket.onmessage = (event) => {
                 isStatusActive = false;
                 document.getElementById('system').textContent = 'Ngoại tuyến';
             }, OFFLINE_INTERVAL);
-
             myChart.update();
         }
     }
