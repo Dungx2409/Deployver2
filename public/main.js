@@ -39,20 +39,19 @@ const myChart = new Chart(ctx, {
     }
 });
 
-// 📡 Nhận dữ liệu thời gian thực qua WebSocket
-// const socket = new WebSocket('ws://localhost:3000');
+// Nhận dữ liệu thời gian thực qua WebSocket
 const socket = new WebSocket(`wss://${window.location.host}`);
 
 
-let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
-let isStatusActive = false;
+let isRealtimeMode = true;
+let isStatusActive = true;
 let offlineTimeout = null;
-const OFFLINE_INTERVAL = 10000;
+const OFFLINE_INTERVAL = 30000;
 
 socket.onmessage = (event) => {
     const json = JSON.parse(event.data);
     console.log('Realtime data:', json);
-    const dateOnly = json.timestamp.split(' ')[0] || json.timestamp.split('T')[0];
+
     if (json.temperature !== undefined && json.turbidity !== undefined) {
         if (isRealtimeMode) {
             labels.push(dateOnly);
@@ -75,6 +74,7 @@ socket.onmessage = (event) => {
                 isStatusActive = false;
                 document.getElementById('system').textContent = 'Ngoại tuyến';
             }, OFFLINE_INTERVAL);
+
             myChart.update();
         }
     }
@@ -90,9 +90,12 @@ socket.onmessage = (event) => {
     if (json.turbidity !== undefined) {
         updateWaterQuality(json.turbidity);
     }
+    if(json.temperature !== undefined) {
+        updateTemperature(json.temperature);
+    }
 };
 
-// 📥 Tải dữ liệu cũ từ Firebase thông qua server
+// Tải dữ liệu cũ từ Firebase thông qua server
 async function loadHistory() {
     const from = document.getElementById('from-date').value;
     const to = document.getElementById('to-date').value;
@@ -136,6 +139,7 @@ async function loadHistory() {
         isRealtimeMode = true;
     }
 }
+
 
 function enableRealtime() {
     isRealtimeMode = true;
@@ -197,7 +201,7 @@ async function controlServo(value) {
     }
 }
 
-// Hàm cập nhật lượng thức ăn dựa vào distance (sửa element ID)
+// Hàm cập nhật lượng thức ăn dựa vào distance
 function updateFoodLevel(distanceInCm) {
     const foodPercentageElement = document.getElementById('food-percentage');
     const foodStatusElement = document.getElementById('food-status');
@@ -210,7 +214,7 @@ function updateFoodLevel(distanceInCm) {
         return;
     }
 
-    // Tính toán mức thức ăn (distance càng lớn = thức ăn càng ít)
+    // Tính toán mức thức ăn
     let foodLevel;
     let levelText;
     let statusText;
@@ -239,6 +243,19 @@ function updateFoodLevel(distanceInCm) {
 
     foodPercentageElement.textContent = levelText;
     foodStatusElement.textContent = statusText;
+}
+
+function updateTemperature(temperature) {
+    const temperatureElement = document.getElementById('current-temperature');
+    if (!temperatureElement) return;
+
+    if (temperature === undefined || temperature === null) {
+        temperatureElement.textContent = '--';
+        return;
+    }
+
+    // Cập nhật giá trị nhiệt độ
+    temperatureElement.textContent = `${temperature} °C`;
 }
 
 // Hàm cập nhật chất lượng nước
@@ -287,7 +304,6 @@ function updateMotionDetection(pirValue) {
         return;
     }
 
-    // PIR sensor: 1 = có chuyển động, 0 = không có chuyển động
     if (pirValue === 1 || pirValue === '1' || pirValue === true) {
         motionElement.textContent = 'Phát hiện chuyển động';
         motionElement.style.color = '#ff5722';
@@ -376,7 +392,7 @@ function enableAlert() {
 }
 
 
-// 🕒 Tự động set ngày hôm nay và hôm qua
+// Tự động set ngày hôm nay và hôm qua
 window.onload = () => {
     const today = new Date();
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
@@ -396,7 +412,7 @@ window.onload = () => {
     loadDeviceStatus();
 };
 
-// 📡 Hàm tải trạng thái thiết bị ban đầu
+// Hàm tải trạng thái thiết bị ban đầu
 async function loadDeviceStatus() {
     try {
         const today = new Date();
