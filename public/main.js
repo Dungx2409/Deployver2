@@ -52,7 +52,7 @@ const OFFLINE_INTERVAL = 30000;
 socket.onmessage = (event) => {
     const json = JSON.parse(event.data);
     console.log('Realtime data:', json);
-
+    const dateOnly = json.timestamp.split(' ')[0] || json.timestamp.split('T')[0];
     if (json.temperature !== undefined && json.turbidity !== undefined) {
         if (isRealtimeMode) {
             labels.push(dateOnly);
