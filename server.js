@@ -1,7 +1,9 @@
 const express = require('express');
+const fs = require('fs');
 const cors = require('cors');
 const http = require('http');
 const path = require('path');
+
 const { setupWebSocket } = require('./websocket');
 const { setupMQTT, publishServoControl } = require('./mqttHandler');
 const { db, ref, get, query, orderByChild, startAt, endAt } = require('./firebase');
@@ -65,6 +67,44 @@ app.get('/data_sensor', async (req, res) => {
         console.error('Error fetching sensor data:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+
+// Đăng ký tài khoản
+app.post('/register', (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Thiếu thông tin.' });
+    }
+    const usersPath = path.join(__dirname, 'users.json');
+    let users = [];
+    if (fs.existsSync(usersPath)) {
+        users = JSON.parse(fs.readFileSync(usersPath));
+    }
+    if (users.find(u => u.username === username)) {
+        return res.status(409).json({ message: 'Tài khoản đã tồn tại.' });
+    }
+    users.push({ username, password });
+    fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+    res.json({ message: 'Đăng ký thành công.' });
+});
+
+// Đăng nhập
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Thiếu thông tin.' });
+    }
+    const usersPath = path.join(__dirname, 'users.json');
+    let users = [];
+    if (fs.existsSync(usersPath)) {
+        users = JSON.parse(fs.readFileSync(usersPath));
+    }
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) {
+        return res.status(401).json({ message: 'Sai tài khoản hoặc mật khẩu.' });
+    }
+    res.json({ message: 'Đăng nhập thành công.' });
 });
 
 // Lắng nghe cổng Render cung cấp

@@ -1,3 +1,79 @@
+// ==== ĐĂNG XUẤT ==== //
+function handleLogout() {
+    localStorage.removeItem('loggedIn');
+    localStorage.removeItem('username');
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('auth-modal').style.display = 'flex';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+});
+
+// ==== ĐĂNG KÝ ==== //
+async function handleRegisterSubmit(e) {
+    e.preventDefault();
+    const username = document.getElementById('register-username').value.trim();
+    const password = document.getElementById('register-password').value;
+    try {
+        // const res = await fetch('http://localhost:3000/register', {
+        const res = await fetch('https://traica-deploy.onrender.com/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            document.getElementById('auth-message').textContent = 'Đăng ký thành công! Bạn có thể đăng nhập.';
+            document.getElementById('auth-message').style.color = 'green';
+        } else {
+            document.getElementById('auth-message').textContent = data.message || 'Đăng ký thất bại!';
+            document.getElementById('auth-message').style.color = 'red';
+        }
+    } catch (err) {
+        document.getElementById('auth-message').textContent = 'Lỗi kết nối server!';
+        document.getElementById('auth-message').style.color = 'red';
+    }
+}
+
+const registerForm = document.getElementById('register-form');
+if (registerForm) {
+    registerForm.addEventListener('submit', handleRegisterSubmit);
+}
+async function handleLoginSubmit(e) {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    try {
+        // const res = await fetch('http://localhost:3000/login', {
+        const res = await fetch('https://traica-deploy.onrender.com/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            localStorage.setItem('loggedIn', 'true');
+            localStorage.setItem('username', username);
+            document.getElementById('auth-modal').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        } else {
+            document.getElementById('auth-message').textContent = data.message || 'Đăng nhập thất bại!';
+        }
+    } catch (err) {
+        document.getElementById('auth-message').textContent = 'Lỗi kết nối server!';
+    }
+}
+
+const loginForm = document.getElementById('login-form');
+
+if (loginForm) {
+    loginForm.addEventListener('submit', handleLoginSubmit);
+}
+
 const labels = []; // thời gian
 const tempData = []; // nhiệt độ
 const turbData = []; // độ đục
@@ -111,7 +187,7 @@ async function loadHistory() {
     try {
 
         const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${from}&to=${to}`);
-
+        // const response = await fetch(`http://localhost:3000/data_sensor?from=${from}&to=${to}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -167,7 +243,7 @@ function enableRealtime() {
     console.log('Đã bật chế độ thời gian thực');
 }
 
-// 🎛️ Hàm điều khiển servo
+// Hàm điều khiển servo
 async function controlServo(value) {
     try {
         const statusElement = document.getElementById('servo-status');
@@ -175,6 +251,7 @@ async function controlServo(value) {
         statusElement.style.color = 'orange';
 
         const response = await fetch(`https://traica-deploy.onrender.com/control/servo`, {
+        // const response = await fetch(`http://localhost:3000/control/servo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -423,7 +500,9 @@ async function loadDeviceStatus() {
                        String(today.getDate()).padStart(2, '0');
         
         // Tải dữ liệu sensor mới nhất để lấy trạng thái thiết bị
-        const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${todayStr}&to=${todayStr}`);
+        // const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${todayStr}&to=${todayStr}`);
+        
+        const response = await fetch(`http://localhost:3000/data_sensor?from=${todayStr}&to=${todayStr}`);
 
         if (response.ok) {
             const data = await response.json();
