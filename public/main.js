@@ -172,7 +172,7 @@ socket.onmessage = (event) => {
     }
 };
 
-// 📥 Tải dữ liệu cũ từ Firebase thông qua server
+// Tải dữ liệu cũ từ Firebase thông qua server
 async function loadHistory() {
     const from = document.getElementById('from-date').value;
     const to = document.getElementById('to-date').value;
@@ -195,13 +195,11 @@ async function loadHistory() {
         const data = await response.json();
         console.log('Dữ liệu lịch sử:', data);
 
-        // Xoá dữ liệu cũ trên biểu đồ
         labels.length = 0;
         tempData.length = 0;
         turbData.length = 0;
 
         data.forEach(d => {
-            // Chỉ hiển thị ngày, bỏ giờ
             const dateOnly = d.timestamp.split(' ')[0] || d.timestamp.split('T')[0];
             labels.push(dateOnly);
             tempData.push(d.temperature);
@@ -224,11 +222,9 @@ function enableRealtime() {
     tempData.length = 0;
     turbData.length = 0;
 
-    // Tự động cập nhật ngày hôm qua và hôm nay
     const today = new Date();
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
     
-    // Chuyển đổi thành định dạng YYYY-MM-DD theo múi giờ địa phương
     const formatDate = (date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -500,9 +496,9 @@ async function loadDeviceStatus() {
                        String(today.getDate()).padStart(2, '0');
         
         // Tải dữ liệu sensor mới nhất để lấy trạng thái thiết bị
-        // const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${todayStr}&to=${todayStr}`);
+        const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${todayStr}&to=${todayStr}`);
         
-        const response = await fetch(`http://localhost:3000/data_sensor?from=${todayStr}&to=${todayStr}`);
+        // const response = await fetch(`http://localhost:3000/data_sensor?from=${todayStr}&to=${todayStr}`);
 
         if (response.ok) {
             const data = await response.json();
