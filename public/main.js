@@ -335,13 +335,13 @@ function updateWaterQuality(turbidity) {
     let qualityText;
     let statusText;
 
-    if (turbidity <= 100) {
+    if (turbidity >= 75 && turbidity <= 100) {
         qualityText = 'Rất tốt';
         statusText = 'An toàn';
-    } else if (turbidity <= 75) {
+    } else if (turbidity >= 50 && turbidity < 75) {
         qualityText = 'Tốt';
         statusText = 'Bình thường';
-    } else if (turbidity <= 50) {
+    } else if (turbidity >= 25 && turbidity < 50) {
         qualityText = 'Trung bình';
         statusText = 'Cần theo dõi';
     } else {
