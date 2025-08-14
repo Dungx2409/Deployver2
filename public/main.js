@@ -92,7 +92,7 @@ const myChart = new Chart(ctx, {
                 fill: false
             },
             {
-                label: 'Độ đục (ADC)',
+                label: 'Độ đục (%)',
                 data: turbData,
                 borderWidth: 2,
                 borderColor: 'blue',
