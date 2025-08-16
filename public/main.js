@@ -115,7 +115,7 @@ const myChart = new Chart(ctx, {
     }
 });
 
-// 📡 Nhận dữ liệu thời gian thực qua WebSocket
+// Nhận dữ liệu thời gian thực qua WebSocket
 // const socket = new WebSocket('ws://localhost:3000');
 const socket = new WebSocket(`wss://${window.location.host}`);
 
@@ -467,7 +467,7 @@ function enableAlert() {
 }
 
 
-// 🕒 Tự động set ngày hôm nay và hôm qua
+//Tự động set ngày hôm nay và hôm qua
 window.onload = () => {
     const today = new Date();
     const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
@@ -487,7 +487,7 @@ window.onload = () => {
     loadDeviceStatus();
 };
 
-// 📡 Hàm tải trạng thái thiết bị ban đầu
+//Hàm tải trạng thái thiết bị ban đầu
 async function loadDeviceStatus() {
     try {
         const today = new Date();
