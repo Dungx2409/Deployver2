@@ -21,8 +21,9 @@ let lastNotifications = {
 const NOTIFICATION_COOLDOWN = 5 * 60 * 1000; // 5 phút cooldown
 
 function sendPushsaferNotification(title, message, user, sound = 0, vibration = 1, icon = 4) {
-    // Gán user vào biến toàn cục để các hàm khác dùng được
-    UserMail = user.username;
+    if (user && user.username) {
+        UserMail = user.username;
+    }
     return new Promise((resolve, reject) => {
         const msg = {
             m: message + '\nUser: ' + JSON.stringify(user),
