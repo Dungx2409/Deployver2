@@ -19,8 +19,8 @@ async function handleRegisterSubmit(e) {
     const username = document.getElementById('register-username').value.trim();
     const password = document.getElementById('register-password').value;
     try {
-        // const res = await fetch('http://localhost:3000/register', {
-        const res = await fetch('https://traica-deploy.onrender.com/register', {
+        const res = await fetch('http://localhost:3000/register', {
+        // const res = await fetch('https://traica-deploy.onrender.com/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -48,8 +48,8 @@ async function handleLoginSubmit(e) {
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
     try {
-        // const res = await fetch('http://localhost:3000/login', {
-        const res = await fetch('https://traica-deploy.onrender.com/login', {
+        const res = await fetch('http://localhost:3000/login', {
+        // const res = await fetch('https://traica-deploy.onrender.com/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, password })
@@ -116,8 +116,8 @@ const myChart = new Chart(ctx, {
 });
 
 // Nhận dữ liệu thời gian thực qua WebSocket
-// const socket = new WebSocket('ws://localhost:3000');
-const socket = new WebSocket(`wss://${window.location.host}`);
+const socket = new WebSocket('ws://localhost:3000');
+// const socket = new WebSocket(`wss://${window.location.host}`);
 
 
 let isRealtimeMode = true; // Biến để kiểm soát chế độ realtime
@@ -186,8 +186,8 @@ async function loadHistory() {
 
     try {
 
-        const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${from}&to=${to}`);
-        // const response = await fetch(`http://localhost:3000/data_sensor?from=${from}&to=${to}`);
+        // const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${from}&to=${to}`);
+        const response = await fetch(`http://localhost:3000/data_sensor?from=${from}&to=${to}`);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -246,8 +246,8 @@ async function controlServo(value) {
         statusElement.textContent = 'Đang gửi lệnh...';
         statusElement.style.color = 'orange';
 
-        const response = await fetch(`https://traica-deploy.onrender.com/control/servo`, {
-        // const response = await fetch(`http://localhost:3000/control/servo`, {
+        // const response = await fetch(`https://traica-deploy.onrender.com/control/servo`, {
+        const response = await fetch(`http://localhost:3000/control/servo`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -496,9 +496,9 @@ async function loadDeviceStatus() {
                        String(today.getDate()).padStart(2, '0');
         
         // Tải dữ liệu sensor mới nhất để lấy trạng thái thiết bị
-        const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${todayStr}&to=${todayStr}`);
+        // const response = await fetch(`https://traica-deploy.onrender.com/data_sensor?from=${todayStr}&to=${todayStr}`);
         
-        // const response = await fetch(`http://localhost:3000/data_sensor?from=${todayStr}&to=${todayStr}`);
+        const response = await fetch(`http://localhost:3000/data_sensor?from=${todayStr}&to=${todayStr}`);
 
         if (response.ok) {
             const data = await response.json();

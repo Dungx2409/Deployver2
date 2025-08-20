@@ -1,7 +1,8 @@
 const mqtt = require('mqtt');
 const { db, ref, push } = require('./firebase');
+const { processSensorData } = require('./pushsaferHandler');
 let wsClients = [];
-let mqttClient = null; // Lưu client để sử dụng cho publish
+let mqttClient = null;
 
 function setupMQTT(wsList) {
   wsClients = wsList;
@@ -19,7 +20,8 @@ function setupMQTT(wsList) {
     // Lưu vào Firebase
     push(ref(db, 'data_sensor'), data);
 
-
+    processSensorData(data);
+    
     // Gửi qua WebSocket
     wsClients.forEach(ws => {
       if (ws.readyState === 1) ws.send(JSON.stringify(data));

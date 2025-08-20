@@ -7,6 +7,7 @@ const path = require('path');
 const { setupWebSocket } = require('./websocket');
 const { setupMQTT, publishServoControl } = require('./mqttHandler');
 const { db, ref, get, query, orderByChild, startAt, endAt } = require('./firebase');
+const pushsaferHandler = require('./pushsaferHandler');
 
 const app = express();
 const server = http.createServer(app);
@@ -20,7 +21,6 @@ app.use(express.json()); // Parse 50JSON body
 // Setup WebSocket & MQTT
 const wsClients = setupWebSocket(server);
 setupMQTT(wsClients);
-
 // API endpoint điều khiển servo
 app.post('/control/servo', (req, res) => {
     try {
@@ -100,11 +100,17 @@ app.post('/login', (req, res) => {
     if (fs.existsSync(usersPath)) {
         users = JSON.parse(fs.readFileSync(usersPath));
     }
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-        return res.status(401).json({ message: 'Sai tài khoản hoặc mật khẩu.' });
-    }
-    res.json({ message: 'Đăng nhập thành công.' });
+        const user = users.find(u => u.username === username && u.password === password);
+        if (!user) {
+            return res.status(401).json({ message: 'Sai tài khoản hoặc mật khẩu.' });
+        }
+        // Gửi object user qua pushsaferHandler
+        pushsaferHandler.sendPushsaferNotification(
+            'Đăng nhập thành công',
+            'Có người đăng nhập',
+            user
+        ).catch(err => console.error('Pushsafer error:', err));
+        res.json({ message: 'Đăng nhập thành công.' });
 });
 
 // Lắng nghe cổng Render cung cấp
